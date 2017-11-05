@@ -71,6 +71,15 @@ func (a *auther) setRequestTokenAuthHeader(req *http.Request) error {
 	}
 	oauthParams[oauthSignatureParam] = signature
 	req.Header.Set(authorizationHeaderParam, authHeaderValue(oauthParams))
+
+	if a.config.IncludeQueryParams {
+		values := req.URL.Query()
+		for k, v := range oauthParams {
+			values.Add(k, v)
+		}
+		req.URL.RawQuery = values.Encode()
+	}
+
 	return nil
 }
 

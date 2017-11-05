@@ -28,6 +28,8 @@ type Config struct {
 	Endpoint Endpoint
 	// OAuth1 Signer (defaults to HMAC-SHA1)
 	Signer Signer
+	// Includes OAuth1 params in URL query
+	IncludeQueryParams bool
 }
 
 // NewConfig returns a new Config with the given consumer key and secret.

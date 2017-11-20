@@ -30,6 +30,8 @@ type Config struct {
 	Signer Signer
 	// Includes OAuth1 params in URL query
 	IncludeQueryParams bool
+	// Disables the callback confirmation.
+	DisableCallbackConfirm bool
 }
 
 // NewConfig returns a new Config with the given consumer key and secret.
@@ -93,9 +95,12 @@ func (c *Config) RequestToken() (requestToken, requestSecret string, err error) 
 	if requestToken == "" || requestSecret == "" {
 		return "", "", errors.New("oauth1: Response missing oauth_token or oauth_token_secret")
 	}
-	if values.Get(oauthCallbackConfirmedParam) != "true" {
-		return "", "", errors.New("oauth1: oauth_callback_confirmed was not true")
+	if c.DisableCallbackConfirm != true {
+		if values.Get(oauthCallbackConfirmedParam) != "true" {
+			return "", "", errors.New("oauth1: oauth_callback_confirmed was not true")
+		}
 	}
+
 	return requestToken, requestSecret, nil
 }
 

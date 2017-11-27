@@ -58,6 +58,7 @@ func newAuther(config *Config) *auther {
 // setRequestTokenAuthHeader adds the OAuth1 header for the request token
 // request (temporary credential) according to RFC 5849 2.1.
 func (a *auther) setRequestTokenAuthHeader(req *http.Request) error {
+
 	oauthParams := a.commonOAuthParams()
 	oauthParams[oauthCallbackParam] = a.config.CallbackURL
 	params, err := collectParameters(req, oauthParams)
@@ -100,6 +101,15 @@ func (a *auther) setAccessTokenAuthHeader(req *http.Request, requestToken, reque
 	}
 	oauthParams[oauthSignatureParam] = signature
 	req.Header.Set(authorizationHeaderParam, authHeaderValue(oauthParams))
+
+	if a.config.IncludeQueryParams {
+		values := req.URL.Query()
+		for k, v := range oauthParams {
+			values.Add(k, v)
+		}
+		req.URL.RawQuery = values.Encode()
+	}
+
 	return nil
 }
 
@@ -119,6 +129,15 @@ func (a *auther) setRequestAuthHeader(req *http.Request, accessToken *Token) err
 	}
 	oauthParams[oauthSignatureParam] = signature
 	req.Header.Set(authorizationHeaderParam, authHeaderValue(oauthParams))
+
+	if a.config.IncludeQueryParams {
+		values := req.URL.Query()
+		for k, v := range oauthParams {
+			values.Add(k, v)
+		}
+		req.URL.RawQuery = values.Encode()
+	}
+
 	return nil
 }
 
